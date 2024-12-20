@@ -4,8 +4,9 @@
   "description": "bet realtime",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "postinstall": "npx prisma generate",
     "build": "tsc --traceResolution",
     "lint": "eslint . --ext .ts",
     "seed": "ts-node prisma/seed.ts",
@@ -39,6 +40,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
     "prettier": "^3.0.3",
+    "prisma": "^6.1.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }
