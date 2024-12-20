@@ -55,7 +55,7 @@ export const setupSocketHandlers = (io: Server) => {
 
       socket.emit('leaderboardUpdate', {
         type: 'leaderboardUpdate',
-        data: leaderboard.map(user => ({
+        data: leaderboard.map((user: any) => ({
           userId: user.id,
           userName: user.username,
           points: user.points

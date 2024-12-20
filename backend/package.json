@@ -4,12 +4,13 @@
   "description": "bet realtime",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
+    "postinstall": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc --traceResolution",
     "lint": "eslint . --ext .ts",
     "seed": "ts-node prisma/seed.ts",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "npx prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "format": "prettier --write"
