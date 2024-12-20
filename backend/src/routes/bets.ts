@@ -12,6 +12,7 @@ router.post('/', authenticateToken, async (req, res) => {
     if (!req.user) {
       res.status(401).json({ error: 'Unauthenticated request' });
     }
+    // @ts-ignore
     const userId = req.user.userId;
 
     const game = await prisma.game.findUnique({ where: { id: gameId } });
