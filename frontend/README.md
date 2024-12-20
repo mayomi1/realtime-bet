@@ -28,3 +28,8 @@ VITE_BACKEND_URL=http://localhost:3002
 - run `npm install`
 - run `npm run dev`
 
+
+### Test
+- `npm run test`
+- `npm run test:ui`
+
