@@ -22,4 +22,9 @@ VITE_BACKEND_URL=http://localhost:3002
 - Handle authentication and authorization proper
 - Ensure the user state is persisted on browser refresh
 
+### How to run
+
+- Ensure the env is added
+- run `npm install`
+- run `npm run dev`
 
