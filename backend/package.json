@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "bet realtime",
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
@@ -15,7 +15,7 @@
     "format": "prettier --write"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mayomi Ayaniran",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.1.0",
