@@ -13,7 +13,10 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
-const origin = [ process.env.FRONTEND_URL || 'http://localhost:5173', 'https://363a-2c0f-f5c0-b04-17fa-51fb-326a-63ec-df6b.ngrok-free.app' ];
+const origin = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'https://realtime-bet.vercel.app'
+];
 
 const io = new Server(httpServer, {
   cors: {
