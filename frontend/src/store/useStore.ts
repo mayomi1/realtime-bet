@@ -234,6 +234,8 @@ export const useStore = create<Store>((set, get) => ({
       socket.disconnect();
     }
     if (betRefreshInterval) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       clearInterval(betRefreshInterval);
     }
     set({ socket: null, betRefreshInterval: null });
