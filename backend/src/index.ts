@@ -13,9 +13,11 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+const origin = [ process.env.FRONTEND_URL || 'http://localhost:5173', 'https://363a-2c0f-f5c0-b04-17fa-51fb-326a-63ec-df6b.ngrok-free.app' ];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin,
     methods: ['GET', 'POST']
   }
 });
@@ -23,7 +25,7 @@ const io = new Server(httpServer, {
 export const prisma = new PrismaClient();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin,
 }));
 app.use(express.json());
 
@@ -35,7 +37,7 @@ app.use('/api/games', gameRoutes);
 // Socket.IO setup
 setupSocketHandlers(io);
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 8080;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
