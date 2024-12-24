@@ -8,8 +8,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "typeRoots": ["./src/types", "./node_modules/@types"],
-    "types": ["express", "node"]
+    "types": ["express", "node", "jest"]
   },
-  "include": ["src/**/*", "prisma/**/*"],
+  "include": [
+    "src/**/*",
+    "prisma/**/*",
+  ],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { prisma } from './index';
+import { prisma } from './lib/prisma';
 
 interface SocketData {
   userId?: string;

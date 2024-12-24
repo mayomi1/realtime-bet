@@ -1,17 +1,16 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
-import authRoutes from './routes/auth';
-import betRoutes from './routes/bets';
-import gameRoutes from './routes/games';
+import authRoutes from './routes/authRoutes';
+import betRoutes from './routes/betRoutes';
+import gameRoutes from './routes/gameRoutes';
 import { setupSocketHandlers } from './socket';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const httpServer = createServer(app);
 const origin = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -24,8 +23,6 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST']
   }
 });
-
-export const prisma = new PrismaClient();
 
 app.use(cors({
   origin,
