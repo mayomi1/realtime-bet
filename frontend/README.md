@@ -11,7 +11,7 @@
 ### Environment variables
 .env
 ```dotenv
-VITE_BACKEND_URL=http://localhost:3002
+VITE_BACKEND_URL=http://localhost:8080
 ```
 
 ### What I would have added assuming this enough time

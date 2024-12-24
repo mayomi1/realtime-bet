@@ -8,3 +8,6 @@
 Instructions to run each project are on their README respectively
 
 - URL: https://realtime-bet.vercel.app/
+
+- Backend [readme](backend/README.md)
+- Frontend [readme](frontend/README.md)
