@@ -1,4 +1,4 @@
-import {BetRequestDTO, NotFoundError} from "../types";
+import {BadRequestError, BetRequestDTO, NotFoundError} from "../types";
 import {Bet} from "@prisma/client";
 import {IBetRepository} from "../repositories/betRepository";
 import {IGameRepository} from "../repositories/gameRepository";
@@ -28,6 +28,10 @@ export class BetService implements IBetService {
     const game = await this.gameRepository.findById(betData.gameId);
     if (!game) {
       throw new NotFoundError('Game not found');
+    }
+
+    if (game.status !== 'LIVE') {
+      throw new BadRequestError('Game is not Live')
     }
 
     const odds = betData.team === 'team1' ? game.odds1 : game.odds2;

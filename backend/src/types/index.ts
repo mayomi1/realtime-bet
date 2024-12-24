@@ -21,6 +21,13 @@ export class NotFoundError extends Error {
   }
 }
 
+export class BadRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'BadRequestError';
+  }
+}
+
 export interface AuthenticatedRequest extends Request {
   user: {
     userId: number;

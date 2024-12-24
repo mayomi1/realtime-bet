@@ -1,76 +1,135 @@
 import { Server, Socket } from 'socket.io';
+import * as jwt from 'jsonwebtoken';
 import { prisma } from './lib/prisma';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
-interface SocketData {
-  userId?: string;
+interface DecodedToken {
+  userId: number;
+  // Add other token payload fields as needed
+}
+
+interface AuthenticatedSocket extends Socket {
+  userId?: number;
   subscribedToGames: boolean;
   subscribedToLeaderboard: boolean;
 }
 
-export const setupSocketHandlers = (io: Server) => {
-  io.on('connection', async (socket: Socket) => {
-    // Initialize socket data
-    const socketData: SocketData = {
-      subscribedToGames: false,
-      subscribedToLeaderboard: false
-    };
+interface SocketData {
+  userId?: number;
+  subscribedToGames: boolean;
+  subscribedToLeaderboard: boolean;
+}
 
-    console.log('Client connected:', socket.id);
+const authenticateSocket = (
+  socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>,
+  next: (err?: Error) => void
+) => {
+  const token = socket.handshake.auth.token || socket.handshake.headers['authorization'];
+
+  if (!token) {
+    return next(new Error('Authentication token missing'));
+  }
+
+  try {
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+
+    // Initialize socket data
+    socket.data.userId = decoded.userId;
+    socket.data.subscribedToGames = false;
+    socket.data.subscribedToLeaderboard = false;
+
+    next();
+  } catch (error) {
+    next(new Error('Invalid token'));
+  }
+};
+
+export const setupSocketHandlers = (io: Server) => {
+  io.use(authenticateSocket);
+
+  io.on('connection', async (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>) => {
+    // Initialize socket data
+
+    console.log('Client connected:', socket.id, 'User:', socket.data.userId);
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: socket.data.userId }
+      });
+
+      if (!user) {
+        socket.disconnect();
+        return;
+      }
+    } catch (error) {
+      console.error('Error verifying user:', error);
+      socket.disconnect();
+      return;
+    }
 
     socket.on('subscribe_games', async () => {
-      // console.log('Client subscribed to games:', socket.id);
-      socketData.subscribedToGames = true;
+      socket.data.subscribedToGames = true;
 
-      // Send initial games data
-      const games = await prisma.game.findMany({
-        where: {
-          status: {
-            in: ['PENDING', 'LIVE']
+      try {
+        // Send initial games data
+        const games = await prisma.game.findMany({
+          where: {
+            status: {
+              in: ['LIVE']
+            }
           }
-        }
-      });
+        });
 
-      socket.emit('gameData', {
-        type: 'gameData',
-        data: games
-      });
+        socket.emit('gameData', {
+          type: 'gameData',
+          data: games
+        });
+      } catch (error) {
+        console.error('Error fetching games:', error);
+        socket.emit('error', { message: 'Failed to fetch games data' });
+      }
     });
 
     socket.on('subscribe_leaderboard', async () => {
-      // console.log('Client subscribed to leaderboard:', socket.id);
-      socketData.subscribedToLeaderboard = true;
+      socket.data.subscribedToLeaderboard = true;
 
-      // Send initial leaderboard data
-      const leaderboard = await prisma.user.findMany({
-        select: {
-          id: true,
-          username: true,
-          points: true
-        },
-        orderBy: {
-          points: 'desc'
-        },
-        take: 10
-      });
+      try {
+        const leaderboard = await prisma.user.findMany({
+          select: {
+            id: true,
+            username: true,
+            points: true
+          },
+          orderBy: {
+            points: 'desc'
+          },
+          take: 10
+        });
 
-      socket.emit('leaderboardUpdate', {
-        type: 'leaderboardUpdate',
-        data: leaderboard.map((user: any) => ({
-          userId: user.id,
-          userName: user.username,
-          points: user.points
-        }))
-      });
+        socket.emit('leaderboardUpdate', {
+          type: 'leaderboardUpdate',
+          data: leaderboard.map((user) => ({
+            userId: user.id,
+            userName: user.username,
+            points: user.points
+          }))
+        });
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        socket.emit('error', { message: 'Failed to fetch leaderboard data' });
+      }
     });
 
     socket.on('disconnect', () => {
-      console.log('Client disconnected:', socket.id);
-      socketData.subscribedToGames = false;
-      socketData.subscribedToLeaderboard = false;
+      console.log('Client disconnected:', socket.id, 'User:', socket.data.userId);
+      socket.data.subscribedToGames = false;
+      socket.data.subscribedToLeaderboard = false;
 
       // Check if there are any remaining subscribers
       const hasSubscribers = Array.from(io.sockets.sockets.values()).some(
-        socket => (socket.data as SocketData).subscribedToGames
+        (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, SocketData>) =>
+          socket.data.subscribedToGames
       );
     });
   });
@@ -96,6 +155,5 @@ function updateGameTime(currentTime: string): string {
   const formattedMinutes = newMinutes.toString().padStart(2, '0');
   const formattedSeconds = newSeconds.toString().padStart(2, '0');
 
-  console.log('<>>>>>>>>>>>>update time')
   return `${formattedMinutes}:${formattedSeconds}`;
 }

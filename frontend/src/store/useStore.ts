@@ -38,7 +38,7 @@ interface Store {
   fetchBets: () => Promise<void>;
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3002';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
 
 export const useStore = create<Store>((set, get) => ({
   socket: null,
@@ -55,10 +55,14 @@ export const useStore = create<Store>((set, get) => ({
   isPlaceBetLoading: false,
   placeBetError: null,
   betRefreshInterval: null,
-  token: localStorage.getItem('token'),
+  token: null,
 
   initializeSocket: () => {
-    const socket = io(BACKEND_URL);
+    const socket = io(BACKEND_URL, {
+      auth: {
+        token: get().token,
+      }
+    });
 
     socket.on('connect', () => {
       console.log('socket connected');
@@ -133,6 +137,7 @@ export const useStore = create<Store>((set, get) => ({
       }
 
       const { token, user } = await response.json();
+      set({ token})
       localStorage.setItem('token', token);
       set({ user });
       get().initializeSocket();
@@ -159,6 +164,7 @@ export const useStore = create<Store>((set, get) => ({
       const { token, user } = await response.json();
       localStorage.setItem('token', token);
       set({ user });
+      set({ token})
       get().initializeSocket();
       get().fetchBets();
     } catch (error) {
