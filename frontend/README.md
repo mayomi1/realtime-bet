@@ -18,8 +18,8 @@ VITE_BACKEND_URL=http://localhost:8080
 
 - Make remain time count down
 - Update status of game
-- Debug why socket close above a while
 - Handle authentication and authorization proper
+- Handle route
 - Ensure the user state is persisted on browser refresh
 
 ### How to run
