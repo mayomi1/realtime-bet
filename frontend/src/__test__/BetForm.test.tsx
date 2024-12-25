@@ -24,7 +24,9 @@ describe('BetForm', () => {
       vi.clearAllMocks();
       // Mock the useStore implementation
       (useStore as any).mockReturnValue({
-      placeBet: mockPlaceBet,
+      placeBet: mockPlaceBet.mockReturnValue({
+        id: 1
+      }),
       isPlaceBetLoading: false,
       placeBetError: null,
       user: { points: 1000 }

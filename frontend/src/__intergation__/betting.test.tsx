@@ -22,6 +22,7 @@ describe('Betting Flow', () => {
         username: 'testuser',
         points: 1000
       },
+      cleanup: vi.fn,
       games: [{
         id: '1',
         team1: 'Team A',
@@ -35,7 +36,9 @@ describe('Betting Flow', () => {
       }],
       bets: [],
       leaderboard: [],
-      placeBet: mockPlaceBet,
+      placeBet: mockPlaceBet.mockReturnValue({
+          id: 1
+      }),
       isPlaceBetLoading: false,
       placeBetError: null,
       initializeSocket: mockInitializeSocket

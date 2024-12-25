@@ -82,7 +82,7 @@ describe('Authentication Flow', () => {
 
     (useStore as any).mockReturnValue({
       ...initStore,
-      error: errorMessage
+      authError: errorMessage
     });
     // Fill and submit form
     fireEvent.change(screen.getByRole('textbox', { name: 'Email' }), {

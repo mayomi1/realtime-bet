@@ -128,7 +128,10 @@ export const useStore = create<Store>((set, get) => ({
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        const error = await response.json();
+        const errorMessage = error.error || 'Login failed';
+        set({authError: errorMessage})
+        throw new Error(errorMessage);
       }
 
       const { token, user } = await response.json();

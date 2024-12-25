@@ -97,7 +97,7 @@ describe('LoginForm', () => {
     (useStore as any).mockReturnValue({
       login: mockLogin,
       register: mockRegister,
-      isLoading: true,
+      isLoadingAuth: true,
       error: null
     })
 
@@ -114,7 +114,7 @@ describe('LoginForm', () => {
       login: mockLogin,
       register: mockRegister,
       isLoading: false,
-      error: errorMessage
+      authError: errorMessage
     })
 
     render(<LoginForm />)
