@@ -19,4 +19,5 @@ JWT_SECRET=some_secret
 - Ensure the env is added
 - run `npm install`
 - run `npm run dev`
+- run `npm test`
 
