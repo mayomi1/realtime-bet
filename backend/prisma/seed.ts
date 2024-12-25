@@ -15,32 +15,32 @@ async function main() {
   const users = await Promise.all([
     prisma.user.create({
       data: {
-        username: 'john_doe',
-        email: 'john@example.com',
-        password: hashedPassword,
-        points: 1000
-      }
-    }),
-    prisma.user.create({
-      data: {
-        username: 'jane_smith',
-        email: 'jane@example.com',
+        username: 'John',
+        email: 'john@test.com',
         password: hashedPassword,
         points: 1500
       }
     }),
     prisma.user.create({
       data: {
-        username: 'bob_wilson',
-        email: 'bob@example.com',
+        username: 'Jane',
+        email: 'jane@test.com',
         password: hashedPassword,
         points: 2000
       }
     }),
     prisma.user.create({
       data: {
-        username: 'alice_johnson',
-        email: 'alice@example.com',
+        username: 'James',
+        email: 'james@test.com',
+        password: hashedPassword,
+        points: 1000
+      }
+    }),
+    prisma.user.create({
+      data: {
+        username: 'Bobby',
+        email: 'bobby@test.com',
         password: hashedPassword,
         points: 750
       }
@@ -51,13 +51,13 @@ async function main() {
   const games = await Promise.all([
     prisma.game.create({
       data: {
-        team1: 'Man2',
-        team2: 'Warriors',
-        score1: 2,
+        team1: 'Man United',
+        team2: 'Real Madrid',
+        score1: 4,
         score2: 3,
         odds1: 1.95,
         odds2: 1.85,
-        timeRemaining: '45min',
+        timeRemaining: '45:00',
         status: 'LIVE'
       }
     }),
@@ -69,7 +69,7 @@ async function main() {
         score2: 3,
         odds1: 2.10,
         odds2: 1.75,
-        timeRemaining: '45min',
+        timeRemaining: '45:00',
         status: 'LIVE'
       }
     }),
@@ -81,8 +81,8 @@ async function main() {
         score2: 0,
         odds1: 1.65,
         odds2: 2.25,
-        timeRemaining: '30min',
-        status: 'PENDING'
+        timeRemaining: '30:00',
+        status: 'LIVE'
       }
     }),
     prisma.game.create({
@@ -93,7 +93,7 @@ async function main() {
         score2: 1,
         odds1: 1.90,
         odds2: 1.90,
-        timeRemaining: '00min',
+        timeRemaining: '00:00',
         status: 'FINISHED'
       }
     })
