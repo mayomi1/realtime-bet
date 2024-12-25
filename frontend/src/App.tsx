@@ -10,12 +10,12 @@ import { UserProfile } from './components/UserProfile';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 const App: React.FC = () => {
-  const { user, initializeSocket, token } = useStore();
+  const { user, initializeSocket, cleanup } = useStore();
 
-  console.log("user ", token)
   useEffect(() => {
     if (user) {
       initializeSocket();
+      return () => cleanup();
     }
   }, [initializeSocket, user]);
 

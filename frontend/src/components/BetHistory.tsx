@@ -8,7 +8,7 @@ export const BetHistory: React.FC = () => {
     fetchBets();
   };
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
+    <div className="bg-white p-4 rounded-lg shadow overflow-y-scroll h-[600px]">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Bet History</h2>
         <button

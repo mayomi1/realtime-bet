@@ -16,10 +16,15 @@ export const BetForm: React.FC<Props> = ({ gameId }) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     if (user?.points - Number(amount) > 0) {
-      await placeBet(gameId, Number(amount), team);
+      const bet = await placeBet(gameId, Number(amount), team);
       setAmount("");
-      toast.success("Bet placed")
-      return;
+      if (bet.id) {
+        toast.success("Bet placed")
+        return;
+      } else {
+        toast.error("Error occurred, try again")
+        return
+      }
     }
     toast.error("You don't have enough points to bet")
 

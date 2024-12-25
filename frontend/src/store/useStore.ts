@@ -34,7 +34,7 @@ interface Store {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (username: string, email: string, password: string) => Promise<void>;
-  placeBet: (gameId: string, amount: number, team: 'team1' | 'team2') => Promise<void>;
+  placeBet: (gameId: string, amount: number, team: 'team1' | 'team2') => Promise<Bet>;
   fetchBets: () => Promise<void>;
 }
 
@@ -88,11 +88,6 @@ export const useStore = create<Store>((set, get) => ({
         get().updateGame(data);
       }
     });
-
-    // Set up periodic bet fetching every 30 seconds
-    setInterval(() => {
-      get().fetchBets();
-    }, 30000);
 
     socket.on('oddsUpdate', ({ data }) => {
       const games = get().games.map(game =>
@@ -203,6 +198,7 @@ export const useStore = create<Store>((set, get) => ({
           }
         });
       }
+      return bet
     } catch (error) {
       set({ placeBetError: error instanceof Error ? error.message : 'Failed to place bet' });
     } finally {
