@@ -14,7 +14,7 @@ describe('useStore', () => {
 
   describe('auth actions', () => {
     it('should handle login successfully', async () => {
-      const mockUser = { id: '1', email: 'test@test.com' };
+      const mockUser = { id: 1, email: 'test@test.com' };
       const mockToken = 'test-token';
 
       global.fetch = vi.fn().mockResolvedValueOnce({
