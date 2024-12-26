@@ -5,6 +5,7 @@ export interface IUserRepository {
   updatePoints(userId: number, amount: number): Promise<void>;
   create(userData: UserCreateDTO): Promise<User>;
   findByEmail(email: string): Promise<User | null>;
+  getById(id: number): Promise<User | null>;
 }
 
 export class PrismaUserRepository implements IUserRepository {
@@ -22,6 +23,12 @@ export class PrismaUserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { email }
+    });
+  }
+
+  async getById(id: number): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { id }
     });
   }
 

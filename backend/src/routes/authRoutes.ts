@@ -23,4 +23,6 @@ router.post('/login',
   validate,
   (req: Request, res: Response) => authController.login(req, res));
 
+router.get('/me', (req: Request, res: Response) => authController.me(req, res))
+
 export default router;

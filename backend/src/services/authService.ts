@@ -7,6 +7,7 @@ import {IUserRepository} from "../repositories/userRepository";
 export interface IAuthService {
   register(userData: RegisterDTO): Promise<AuthResponse>;
   login(credentials: LoginDTO): Promise<AuthResponse>;
+  me(token: string): Promise<AuthResponse>;
 }
 
 export class AuthService implements IAuthService {
@@ -43,6 +44,17 @@ export class AuthService implements IAuthService {
     }
 
     const token = this.generateToken(user.id);
+    return { user, token };
+  }
+
+  async me(token: string): Promise<AuthResponse> {
+    const payload = jwt.verify(token, this.config.jwtSecret) as { userId: number };
+    const user = await this.userRepository.getById(payload.userId);
+
+    if (!user) {
+      throw new UnauthorizedError('Invalid token');
+    }
+
     return { user, token };
   }
 

@@ -42,4 +42,20 @@ export class AuthController {
       }
     }
   }
+
+  async me(req: Request, res: Response) {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({error: 'Unauthorized'});
+      return;
+    }
+
+    try {
+      const result = await this.authService.me(token);
+      res.json(result);
+    } catch (error) {
+      console.error("Error during me request:", error);
+      res.status(500).json({error: 'Internal Server Error'});
+    }
+  }
 }

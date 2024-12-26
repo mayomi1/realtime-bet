@@ -6,7 +6,9 @@ import * as dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import betRoutes from './routes/betRoutes';
 import gameRoutes from './routes/gameRoutes';
+import userRoutes from './routes/userRoutes';
 import { setupSocketHandlers } from './socket';
+import router from "./routes/userRoutes";
 
 dotenv.config();
 
@@ -33,6 +35,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/bets', betRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api', userRoutes)
 
 // Socket.IO setup
 setupSocketHandlers(io);
