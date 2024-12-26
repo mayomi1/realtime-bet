@@ -27,6 +27,7 @@ describe('BetForm', () => {
       placeBet: mockPlaceBet.mockReturnValue({
         id: 1
       }),
+      checkAuth: vi.fn,
       isPlaceBetLoading: false,
       placeBetError: null,
       user: { points: 1000 }

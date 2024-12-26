@@ -40,7 +40,8 @@ describe('GamesList', () => {
   beforeEach(() => {
       vi.clearAllMocks();
       (useStore as any).mockReturnValue({
-      games: mockGames
+      games: mockGames,
+      checkAuth: vi.fn,
     })
   })
 

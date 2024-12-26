@@ -32,7 +32,8 @@ describe('Leaderboard', () => {
       vi.clearAllMocks();
       // Setup default store state
       (useStore as any).mockReturnValue({
-      leaderboard: mockLeaderboard
+      leaderboard: mockLeaderboard,
+      checkAuth: vi.fn,
     })
   })
 

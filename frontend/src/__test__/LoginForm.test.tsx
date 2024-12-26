@@ -20,7 +20,8 @@ describe('LoginForm', () => {
       login: mockLogin,
       register: mockRegister,
       isLoading: false,
-      error: null
+      error: null,
+      checkAuth: vi.fn,
     })
   })
 

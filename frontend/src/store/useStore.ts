@@ -36,6 +36,7 @@ interface Store {
   register: (username: string, email: string, password: string) => Promise<void>;
   placeBet: (gameId: string, amount: number, team: 'team1' | 'team2') => Promise<Bet>;
   fetchBets: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
@@ -117,7 +118,27 @@ export const useStore = create<Store>((set, get) => ({
   addBet: (bet) => set({ bets: [...get().bets, bet] }),
   setLeaderboard: (leaderboard) => set({ leaderboard }),
   setError: (error) => set({ error }),
+  checkAuth: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      set({ user: null, isLoading: false });
+      return;
+    }
+    set({ user: null, isLoading: true });
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
+      if (!response.ok) throw new Error('Invalid token');
+
+      const { user } = await response.json();
+      set({ user, isLoading: false });
+    } catch (error) {
+      console.log("error here", error)
+      set({ user: null, isLoading: false });
+    }
+  },
   login: async (email: string, password: string) => {
     try {
       set({ isLoadingAuth: true, authError: null });

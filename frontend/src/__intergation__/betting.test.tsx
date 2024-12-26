@@ -23,6 +23,7 @@ describe('Betting Flow', () => {
         points: 1000
       },
       cleanup: vi.fn,
+      checkAuth: vi.fn,
       games: [{
         id: '1',
         team1: 'Team A',

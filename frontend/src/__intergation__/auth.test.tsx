@@ -26,6 +26,7 @@ describe('Authentication Flow', () => {
     register: mockRegisterFn,
     isLoading: false,
     error: null,
+    checkAuth: vi.fn,
     games: [],
     leaderboard: []
   }
