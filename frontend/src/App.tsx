@@ -1,50 +1,42 @@
-import React, { useEffect } from 'react';
-import { Toaster } from 'sonner'
-
-import { useStore } from './store/useStore';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { LoginForm } from './components/LoginForm';
-import { GamesList } from './components/GamesList';
-import { Leaderboard } from './components/Leaderboard';
-import { BetHistory } from './components/BetHistory';
-import { UserProfile } from './components/UserProfile';
+import { Dashboard } from './components/Dashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { PrivateRoute } from './components/PrivateRoute';
+import { PublicRoute } from './components/PublicRoute';
 
 const App: React.FC = () => {
-  const { user, initializeSocket, cleanup } = useStore();
-
-  useEffect(() => {
-    if (user) {
-      initializeSocket();
-      return () => cleanup();
-    }
-  }, [initializeSocket, user]);
-
-  if (!user) {
-    return (
-      <ErrorBoundary>
-        <LoginForm />
-      </ErrorBoundary>
-    );
-  }
-
   return (
     <ErrorBoundary>
-      <Toaster position="top-right"/>
-      <div className="min-h-screen bg-gray-100 p-4">
-        <div className="max-w-6xl mx-auto">
-          <UserProfile />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <BetHistory />
-            <GamesList />
-            <div className="space-y-4">
-              <Leaderboard />
-            </div>
-          </div>
-        </div>
-      </div>
+      <BrowserRouter>
+        <Toaster position="top-right"/>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginForm />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={<Navigate to="/dashboard" replace />}
+          />
+        </Routes>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 };
 
 export default App;
-
