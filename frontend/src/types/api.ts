@@ -1,12 +1,12 @@
 export interface User {
-  id: string;
+  id: number;
   username: string;
   email: string;
   points: number;
 }
 
 export interface Game {
-  id: string;
+  id: number;
   team1: string;
   team2: string;
   score1: number;
@@ -18,7 +18,7 @@ export interface Game {
 }
 
 export interface Bet {
-  id: string;
+  id: number;
   userId: string;
   gameId: string;
   amount: number;
@@ -29,7 +29,7 @@ export interface Bet {
 }
 
 export interface LeaderboardEntry {
-  userId: string;
+  userId: number;
   userName: string;
   points: number;
 }

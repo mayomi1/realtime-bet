@@ -135,7 +135,6 @@ export const useStore = create<Store>((set, get) => ({
       const { user } = await response.json();
       set({ user, isLoading: false });
     } catch (error) {
-      console.log("error here", error)
       set({ user: null, isLoading: false });
     }
   },
