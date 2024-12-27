@@ -6,7 +6,7 @@ export interface User {
 }
 
 export interface Game {
-  id: number;
+  id: string;
   team1: string;
   team2: string;
   score1: number;
@@ -18,7 +18,7 @@ export interface Game {
 }
 
 export interface Bet {
-  id: number;
+  id: string;
   userId: string;
   gameId: string;
   amount: number;
@@ -29,7 +29,7 @@ export interface Bet {
 }
 
 export interface LeaderboardEntry {
-  userId: number;
+  userId: string;
   userName: string;
   points: number;
 }
