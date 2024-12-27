@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
+import {AuthButton} from "./ui/AuthButton.tsx";
+import ErrorDisplay from "./ui/ErrorDIsplay.tsx";
 
 export const LoginForm: React.FC = () => {
   const [isLogin, setLogin] = useState(true)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('')
-  const { login, register, isLoadingAuth, authError } = useStore();
+  const { login, register, isLoadingAuth, authError, formErrors } = useStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,26 +62,18 @@ export const LoginForm: React.FC = () => {
             required
           />
         </div>
-        {authError && (
-          <div className="mb-4 text-red-500 text-sm" data-testid="error-message">{authError}</div>
-        )}
-        {
-          isLogin ?
-            <button
-              type="submit"
-              disabled={isLoadingAuth}
-              className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:opacity-50"
-            >
-              {isLoadingAuth ? 'Loading...' : 'Login'}
-            </button> :
-            <button
-              type="submit"
-              disabled={isLoadingAuth}
-              className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:opacity-50"
-            >
-              {isLoadingAuth ? 'Loading...' : 'Register'}
-            </button>
-        }
+        <ErrorDisplay
+          error={authError}
+          formErrors={formErrors}
+        />
+
+        <AuthButton
+          isLoading={isLoadingAuth}
+          loadingText="Loading..."
+          className="mt-4"
+        >
+          {isLogin ? 'Login' : 'Register'}
+        </AuthButton>
       </form>
 
       {

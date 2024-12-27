@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
 import { Game, User, Bet, LeaderboardEntry } from '../types/api';
+import {FormErrorsProps} from "../types/error.ts";
 
 interface Store {
   socket: Socket | null;
@@ -14,6 +15,7 @@ interface Store {
   isPlaceBetLoading: boolean,
   placeBetError: string | null
   error: string | null;
+  formErrors: FormErrorsProps | null
   token: string | null;
   isLoadingAuth: boolean,
   authError: string | null,
@@ -46,6 +48,7 @@ export const useStore = create<Store>((set, get) => ({
   user: null,
   isLoadingAuth: false,
   authError: null,
+  formErrors: null,
   games: [],
   bets: [],
   leaderboard: [],
@@ -176,6 +179,10 @@ export const useStore = create<Store>((set, get) => ({
       });
 
       if (!response.ok) {
+        const errors =  await response.json()
+        if (errors) {
+          set({ formErrors: errors })
+        }
         throw new Error('Login failed');
       }
 
