@@ -178,15 +178,17 @@ export const useStore = create<Store>((set, get) => ({
         body: JSON.stringify({ username, email, password })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errors =  await response.json()
-        if (errors) {
-          set({ formErrors: errors })
+        if (data.errors && Array.isArray(data.errors)) {
+          set({ formErrors: { errors: data.errors } });
+          return;
         }
-        throw new Error('Login failed');
+        set({ authError: data.error, formErrors: null })
       }
 
-      const { token, user } = await response.json();
+      const { token, user } = data;
       localStorage.setItem('token', token);
       set({ user });
       set({ token})
