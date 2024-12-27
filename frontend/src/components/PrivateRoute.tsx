@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useEffect, useState } from 'react';
+import LoadingSpinner from "./ui/LoadingSpinner.tsx";
 
 export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading, checkAuth, fetchBets } = useStore();
@@ -22,7 +23,14 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }, [checkAuth, fetchBets]);
 
   if (!isInitialized || isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return user ? <>{children}</> : <Navigate to="/login" replace />;
