@@ -24,6 +24,11 @@ export class AuthService implements IAuthService {
       }
     }
 
+    const existingUsername = await this.userRepository.findByUsername(userData.username);
+    if (existingUsername) {
+      throw new ConflictError('Username is already taken');
+    }
+
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
     const user = await this.userRepository.create({

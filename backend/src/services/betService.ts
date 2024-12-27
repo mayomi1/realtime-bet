@@ -3,6 +3,7 @@ import {Bet} from "@prisma/client";
 import {IBetRepository} from "../repositories/betRepository";
 import {IGameRepository} from "../repositories/gameRepository";
 import {IUserRepository} from "../repositories/userRepository";
+import {setupSocketHandlers, socketHandlers} from "../socket";
 
 export interface IBetService {
   placeBet(userId: number, betData: BetRequestDTO): Promise<Bet>;
@@ -17,7 +18,7 @@ export class BetService implements IBetService {
   ) {}
 
   /**
-   * Places a bet for a user on a specific game.
+   * Places a bet for a user on a specific game and broadcast leaderboard after updates.
    *
    * @param userId - The unique identifier of the user placing the bet.
    * @param betData - The details of the bet, including the game ID, amount, and team.
@@ -44,7 +45,9 @@ export class BetService implements IBetService {
       team: betData.team
     });
 
+
     await this.userRepository.updatePoints(userId, betData.amount);
+    await socketHandlers.broadcastLeaderboard();
 
     return bet;
   }

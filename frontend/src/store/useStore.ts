@@ -19,6 +19,7 @@ interface Store {
   token: string | null;
   isLoadingAuth: boolean,
   authError: string | null,
+  socketConnected: boolean;
 
   // Actions
   initializeSocket: () => void;
@@ -29,7 +30,6 @@ interface Store {
   addBet: (bet: Bet) => void;
   setLeaderboard: (leaderboard: LeaderboardEntry[]) => void;
   setError: (error: string | null) => void;
-  betRefreshInterval: NodeJS.Timer | null;
   cleanup: () => void;
 
   // API calls
@@ -58,53 +58,75 @@ export const useStore = create<Store>((set, get) => ({
   isLoadingBets: false,
   isPlaceBetLoading: false,
   placeBetError: null,
-  betRefreshInterval: null,
   token: null,
+  socketConnected: false,
 
   initializeSocket: () => {
+    if (get().socket?.connected) {
+      return;
+    }
+    get().cleanup();
     const socket = io(BACKEND_URL, {
       auth: {
         token: get().token,
-      }
+      },
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      timeout: 20000,
     });
 
-    socket.on('connect', () => {
-      console.log('socket connected');
+    // Function to set up all event listeners
+    const setupEventListeners = () => {
+      // Clear any existing listeners first
+      socket.removeAllListeners();
 
-      socket.emit('subscribe_games');
-      socket.emit('subscribe_leaderboard');
+      socket.on('connect', () => {
+        console.log('Socket connected');
+        set({ socketConnected: true });
 
-      get().fetchBets();
+        // Re-subscribe to channels on reconnection
+        socket.emit('subscribe_games');
+        socket.emit('subscribe_leaderboard');
+      });
 
-      const intervalId = setInterval(() => {
-        get().fetchBets();
-      }, 30000);
+      socket.on('disconnect', (reason) => {
+        console.log('Socket disconnected:', reason);
+        set({ socketConnected: false });
+      });
 
-      set({ betRefreshInterval: intervalId})
-    });
+      socket.on('gameData', ({ data }) => {
+        if (Array.isArray(data)) {
+          set({ games: data });
+        } else {
+          get().updateGame(data);
+        }
+      });
 
-    socket.on('gameData', ({ data }) => {
-      console.log('Received game data:', data);
+      socket.on('oddsUpdate', ({ data }) => {
+        const games = get().games.map(game =>
+          game.id === data.gameId
+            ? { ...game, odds1: data.odds.team1, odds2: data.odds.team2 }
+            : game
+        );
+        set({ games });
+      });
 
-      if (Array.isArray(data)) {
-        set({ games: data });
-      } else {
-        get().updateGame(data);
-      }
-    });
+      socket.on('leaderboardUpdate', (data) => {
+        console.log('Received leaderboard update:', data); // Debug log
+        set({ leaderboard: data.data });
+      });
 
-    socket.on('oddsUpdate', ({ data }) => {
-      const games = get().games.map(game =>
-        game.id === data.gameId
-          ? { ...game, odds1: data.odds.team1, odds2: data.odds.team2 }
-          : game
-      );
-      set({ games });
-    });
+      // Add reconnect event handler
+      socket.io.on('reconnect', () => {
+        console.log('Socket reconnected - resubscribing to channels');
+        socket.emit('subscribe_games');
+        socket.emit('subscribe_leaderboard');
+      });
+    };
 
-    socket.on('leaderboardUpdate', ({ data }) => {
-      set({ leaderboard: data });
-    });
+    setupEventListeners()
 
     set({ socket });
   },
@@ -138,6 +160,7 @@ export const useStore = create<Store>((set, get) => ({
       const { user } = await response.json();
       set({ user, isLoading: false });
     } catch (error) {
+      console.error(error)
       set({ user: null, isLoading: false });
     }
   },
@@ -230,6 +253,7 @@ export const useStore = create<Store>((set, get) => ({
           }
         });
       }
+      get().fetchBets();
       return bet
     } catch (error) {
       set({ placeBetError: error instanceof Error ? error.message : 'Failed to place bet' });
@@ -240,8 +264,14 @@ export const useStore = create<Store>((set, get) => ({
 
   fetchBets: async () => {
     try {
+      // Prevent multiple simultaneous fetches
+      if (get().isLoadingBets) return;
+
       set({ isLoadingBets: true, fetchBetError: null });
       const token = localStorage.getItem('token');
+      if (!token) {
+        set({ isLoadingBets: false, fetchBetError: "Token not found." });
+      }
       const response = await fetch(`${BACKEND_URL}/api/bets`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -263,16 +293,12 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   cleanup: () => {
-    const { socket, betRefreshInterval } = get();
+    const { socket } = get();
     if (socket) {
+      socket.removeAllListeners();
       socket.disconnect();
     }
-    if (betRefreshInterval) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      clearInterval(betRefreshInterval);
-    }
-    set({ socket: null, betRefreshInterval: null });
+    set({ socket: null, socketConnected: false });
   },
   logout: () => {
     get().cleanup();
